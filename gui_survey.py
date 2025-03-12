@@ -11,7 +11,7 @@ types = ["acknowledge",	"audio",	"background-audio",	"barcode",	"calculate",	"da
          "select_multiple",	"select_multiple_from_file",	"select_one",	"select_one_from_file",	"text",	"time",
          "video",	"xml-external"]
 
-appearances = ["compact",	"draw",	"field-list",	"horizontal",	"horizontal-compact",	"label",	"likert",
+appearances = ["", "compact",	"draw",	"field-list",	"horizontal",	"horizontal-compact",	"label",	"likert",
                "list-nolabel",	"minimal",	"month-year",	"multiline",	"no-calendar",	"quick",	"quickcompact",
                "signature",	"table-list",	"year"]
 
@@ -160,27 +160,3 @@ class Survey(wx.Panel):
         else:
             wx.MessageBox("Veuillez sélectionner une ligne à supprimer.", "Erreur", wx.OK | wx.ICON_WARNING)
 
-
-class Home(wx.Frame):
-    """ Accueil """
-
-    def __init__(self):
-        super(Home, self).__init__(None, title="XlsForm Designer", size=(1200, 600))
-
-        # Créer un notebook (onglets)
-        notebook = wx.Notebook(self)
-
-        # Ajouter l'onglet Survey
-        survey_tab = Survey(notebook)
-        notebook.AddPage(survey_tab, "survey")
-
-        # Ajouter d'autres onglets (exemples)
-        choices = wx.Panel(notebook)
-        notebook.AddPage(choices, "choices")
-
-        settings = wx.Panel(notebook)
-        notebook.AddPage(settings, "settings")
-
-        # Afficher le notebook
-        self.Centre()
-        self.Show()
