@@ -1,5 +1,6 @@
 import wx
 
+from export import Export
 from gui_choices import Choices
 from gui_settings import Settings
 from gui_survey import Survey
@@ -15,8 +16,8 @@ class Home(wx.Frame):
         notebook = wx.Notebook(self)
 
         # Ajouter l'onglet Survey
-        survey_tab = Survey(notebook)
-        notebook.AddPage(survey_tab, "survey")
+        survey = Survey(notebook)
+        notebook.AddPage(survey, "survey")
 
         # Ajouter d'autres onglets (exemples)
         choices = Choices(notebook)
@@ -24,6 +25,9 @@ class Home(wx.Frame):
 
         settings = Settings(notebook)
         notebook.AddPage(settings, "settings")
+
+        export = Export(notebook, survey, choices, settings)
+        notebook.AddPage(export, "Exportation")
 
         # Afficher le notebook
         self.Centre()
