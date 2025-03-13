@@ -4,6 +4,7 @@ from export import Export
 from gui_choices import Choices
 from gui_settings import Settings
 from gui_survey import Survey
+from importation import Import
 
 
 class Home(wx.Frame):
@@ -25,6 +26,9 @@ class Home(wx.Frame):
 
         settings = Settings(notebook)
         notebook.AddPage(settings, "settings")
+
+        importation = Import(notebook, survey, choices, settings)
+        notebook.AddPage(importation, "Importation")
 
         export = Export(notebook, survey, choices, settings)
         notebook.AddPage(export, "Exportation")
