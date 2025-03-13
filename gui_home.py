@@ -1,6 +1,7 @@
 import wx
 
 from gui_choices import Choices
+from gui_settings import Settings
 from gui_survey import Survey
 
 
@@ -21,7 +22,7 @@ class Home(wx.Frame):
         choices = Choices(notebook)
         notebook.AddPage(choices, "choices")
 
-        settings = wx.Panel(notebook)
+        settings = Settings(notebook)
         notebook.AddPage(settings, "settings")
 
         # Afficher le notebook
