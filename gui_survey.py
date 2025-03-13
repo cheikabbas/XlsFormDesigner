@@ -6,17 +6,55 @@ caracteristiques = ["type", "name", "label", "hint", "relevant", "constraint", "
                     "required", "calculation", "choice_filter", "repeat_count", "default", "read_only",
                     "image", "comment", "required_message", "body::accuracyThreshold"]
 
-types = ["acknowledge",	"audio",	"background-audio",	"barcode",	"calculate",	"date",	"dateTime",	"decimal",
-         "file",	"geopoint",	"geoshape",	"geotrace",	"hidden",	"image",	"integer",	"note",	"range",	"rank",
-         "select_multiple",	"select_multiple_from_file",	"select_one",	"select_one_from_file",	"text",	"time",
-         "video",	"xml-external"]
+types = ["acknowledge", "audio", "background-audio", "barcode", "begin group", "begin repeat", "calculate", "date",
+         "dateTime", "decimal", "end group", "end repeat", "file", "geopoint", "geoshape", "geotrace", "hidden",
+         "image", "integer", "note", "range", "rank",
+         "select_multiple", "select_multiple_from_file", "select_one", "select_one_from_file", "text", "time",
+         "video", "xml-external"]
 
-appearances = ["", "compact",	"draw",	"field-list",	"horizontal",	"horizontal-compact",	"label",	"likert",
-               "list-nolabel",	"minimal",	"month-year",	"multiline",	"no-calendar",	"quick",	"quickcompact",
-               "signature",	"table-list",	"year"]
-
+appearances = ["", "compact", "draw", "field-list", "horizontal", "horizontal-compact", "label", "likert",
+               "list-nolabel", "minimal", "month-year", "multiline", "no-calendar", "quick", "quickcompact",
+               "signature", "table-list", "year"]
 
 booleens = ["yes", "no"]
+
+
+class SelectChoice(wx.Dialog):
+    def __init__(self, parent):
+        super(SelectChoice, self).__init__(parent, title="Choice", size=(200, 200))
+
+        self.value = ""
+
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+
+        label = wx.StaticText(self, label="Entrer le nom du choice")
+        self.textCtrl = wx.TextCtrl(self)
+
+        create_button = wx.Button(self, label="Créer")
+        create_button.SetBackgroundColour("#05f762")
+        cancel_button = wx.Button(self, label="Annuler")
+        cancel_button.SetBackgroundColour("#f7052d")
+
+        create_button.Bind(wx.EVT_BUTTON, self.create_action)
+        cancel_button.Bind(wx.EVT_BUTTON, self.cancel_action)
+
+        vbox.Add(label, 0, wx.ALL | wx.EXPAND, 5)
+        vbox.Add(self.textCtrl, 0, wx.ALL | wx.EXPAND, 5)
+
+        hbox.Add(create_button)
+        hbox.Add(cancel_button)
+
+        vbox.Add(hbox)
+
+        self.SetSizer(vbox)
+
+    def create_action(self, event):
+        self.value = self.textCtrl.GetValue()
+        self.EndModal(wx.ID_OK)
+
+    def cancel_action(self, event):
+        self.EndModal(wx.ID_CANCEL)
 
 
 class NewItem(wx.Dialog):
@@ -96,6 +134,11 @@ class NewItem(wx.Dialog):
     def create_action(self, event):
         """Fonction appelée lors de l'enregistrement."""
         self.values = [field.GetValue() for _, field in self.fields]
+        dialog_choice = SelectChoice(self)
+        if self.values[0] == "select_one" or self.values[0] == "select_multiple":
+            if dialog_choice.ShowModal() == wx.ID_OK:
+                self.values[0] = self.values[0] + " " + dialog_choice.value
+            dialog_choice.Destroy()
         self.EndModal(wx.ID_OK)
 
     def cancel_action(self, event):
@@ -159,4 +202,3 @@ class Survey(wx.Panel):
                 self.grid.DeleteRows(selected_row, 1)  # Supprimer la ligne sélectionnée
         else:
             wx.MessageBox("Veuillez sélectionner une ligne à supprimer.", "Erreur", wx.OK | wx.ICON_WARNING)
-

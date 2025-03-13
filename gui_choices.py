@@ -11,8 +11,8 @@ filter_nb = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 
 
 class ChoiceValues(wx.Dialog):
-    def __init__(self, parent, nbval, nbfil):
-        super(ChoiceValues, self).__init__(parent, title="Valeurs du choice", size=(400,400))
+    def __init__(self, parent, nbval):
+        super(ChoiceValues, self).__init__(parent, title="Valeurs du choice", size=(400, 400))
 
         self.fields = []
         self.values = []
@@ -25,12 +25,6 @@ class ChoiceValues(wx.Dialog):
 
         for i in range(nbval):
             label = wx.StaticText(self.scrolled_window, label=f"Valeur {i+1}")
-            val = wx.TextCtrl(self.scrolled_window)
-            self.fields.append((label, val))
-            vbox.Add(label, 0, wx.ALL | wx.EXPAND, 5)
-            vbox.Add(val, 0, wx.ALL | wx.EXPAND, 5)
-        for i in range(nbfil):
-            label = wx.StaticText(self.scrolled_window, label=f"Filtre {i+1}")
             val = wx.TextCtrl(self.scrolled_window)
             self.fields.append((label, val))
             vbox.Add(label, 0, wx.ALL | wx.EXPAND, 5)
@@ -98,15 +92,6 @@ class NewChoice(wx.Dialog):
         vbox.Add(label_nb, 0, wx.ALL | wx.EXPAND, 5)
         vbox.Add(self.text_ctrl_nb, 0, wx.ALL | wx.EXPAND, 5)
 
-        # Champs nombre de filtres
-        label_filter = wx.StaticText(self.scrolled_window, label="Nombre de filtres")
-        self.text_ctrl_filter = wx.ComboBox(self.scrolled_window, choices=filter_nb)
-        self.text_ctrl_filter.SetSelection(0)
-        vbox.Add(label_filter, 0, wx.ALL | wx.EXPAND, 5)
-        vbox.Add(self.text_ctrl_filter, 0, wx.ALL | wx.EXPAND, 5)
-
-        # self.fields.append((label, text_ctrl))
-
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
         create_button = wx.Button(self.scrolled_window, label="Valider")
@@ -131,37 +116,34 @@ class NewChoice(wx.Dialog):
 
     def first_vals(self):
         nb_val = int(self.text_ctrl_nb.GetValue())
-        nb_filter = int(self.text_ctrl_filter.GetValue())
 
         # Ajout des list_name
         for i in range(nb_val):
-            self.values.append(self.text_ctrl.GetValue())
+            self.values.append([self.text_ctrl.GetValue()])
 
         # Ajout des valeurs
         if self.type_val.GetValue() == "Nombre 1 (0,1,2,...)":
-            val = []
             for i in range(nb_val):
-                val.append(str(i))
-            self.values = self.values + val
+                self.values[i].append(str(i))
         elif self.type_val.GetValue() == "Nombre 2 (1,2,3,...)":
-            val = []
-            for i in range(1, nb_val):
-                val.append(str(i))
-            self.values = self.values + val
+            for i in range(1, nb_val+1):
+                self.values[i-1].append(str(i))
         elif self.type_val.GetValue() == "lettres (a,b,c,...)":
-            self.values = self.values + list(string.ascii_lowercase[:nb_val])
+            for i in range(nb_val):
+                self.values[i].append(list(string.ascii_lowercase)[i])
         else:
-            self.values = self.values + list(string.ascii_uppercase[:nb_val])
+            for i in range(nb_val):
+                self.values[i].append(list(string.ascii_uppercase)[i])
 
     def create_action(self, event):
         """Fonction appelée lors de l'enregistrement."""
         nb_val = self.text_ctrl_nb.GetValue()
-        nb_filter = self.text_ctrl_filter.GetValue()
-        if nb_val.isdigit() and nb_filter.isdigit():
+        if nb_val.isdigit():
             self.first_vals()
-            dialog = ChoiceValues(self, int(nb_val), int(nb_filter))
+            dialog = ChoiceValues(self, int(nb_val))
             if dialog.ShowModal() == wx.ID_OK:
-                self.values = self.values + dialog.values
+                for i in range(len(dialog.values)):
+                    self.values[i].append(dialog.values[i])
             dialog.Destroy()
             self.EndModal(wx.ID_OK)
         else:
@@ -209,12 +191,13 @@ class Choices(wx.Panel):
     def newItem(self, event):
         dialog = NewChoice(self)
         if dialog.ShowModal() == wx.ID_OK:
-            # Ajouter une nouvelle ligne au tableau
-            row = self.grid.GetNumberRows()
-            self.grid.AppendRows(1)  # Ajouter une nouvelle ligne
-            for col, value in enumerate(dialog.values):
-                self.grid.SetCellValue(row, col, str(value))  # Remplir les cellules
-            self.grid.AutoSizeColumns()
+           for i in range(len(dialog.values)):
+               # Ajouter une nouvelle ligne au tableau
+               row = self.grid.GetNumberRows()
+               self.grid.AppendRows(1)  # Ajouter une nouvelle ligne
+               for col, value in enumerate(dialog.values[i]):
+                   self.grid.SetCellValue(row, col, str(value))  # Remplir les cellules
+               self.grid.AutoSizeColumns()
         dialog.Destroy()
 
     def delItem(self, event):
